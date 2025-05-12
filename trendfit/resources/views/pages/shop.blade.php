@@ -222,7 +222,7 @@
                                     </div>
                                     
                                     <button 
-                                        class="add-to-cart-btn w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition duration-200"
+                                        class="shop-add-to-cart w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition duration-200"
                                         data-id="{{ $producto->id }}"
                                         data-name="{{ $producto->name }}"
                                         data-price="{{ $producto->price }}"

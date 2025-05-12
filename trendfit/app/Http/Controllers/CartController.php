@@ -24,12 +24,12 @@ class CartController extends Controller
     {
         $request->validate([
             'productId' => 'required|integer|exists:productes,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'nullable|integer|min:1', // Cambiar a nullable
             'size' => 'nullable|string',
         ]);
         
         $productId = $request->productId;
-        $quantity = $request->quantity;
+        $quantity = $request->quantity ?? 1; // Establecer valor por defecto si es null
         $size = $request->size ?? null;
         
         // Comprobar si el producto existe y tiene suficiente stock

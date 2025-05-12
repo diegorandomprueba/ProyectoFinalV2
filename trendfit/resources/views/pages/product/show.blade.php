@@ -91,7 +91,7 @@
             <!-- Botones de compra -->
             <div class="mt-6 space-y-3">
                 <button type="button" 
-                    class="add-to-cart-btn w-full bg-orange-500 text-white py-3 px-6 rounded-lg hover:bg-orange-600 transition duration-200 flex items-center justify-center"
+                    class="product-detail-add-to-cart w-full bg-orange-500 text-white py-3 px-6 rounded-lg hover:bg-orange-600 transition duration-200 flex items-center justify-center"
                     data-id="{{ $producto->id }}"
                     data-name="{{ $producto->name }}"
                     data-price="{{ $producto->price }}"

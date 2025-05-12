@@ -33,11 +33,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Botón de añadir al carrito
-    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    // Botón de añadir al carrito SOLO para la página de detalles del producto
+    // Esta clase debe ser única para la página de detalles del producto
+    const addToCartBtn = document.querySelector('.product-detail-add-to-cart');
     if (addToCartBtn) {
+        console.log('Found add-to-cart button in product details page');
+        
+        // Marcar el botón para evitar duplicidad (por si acaso)
+        addToCartBtn.setAttribute('data-event-bound', 'true');
+        
         addToCartBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            console.log('Product detail add button clicked');
             
             const productId = this.getAttribute('data-id');
             const productName = this.getAttribute('data-name');
@@ -46,8 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const quantity = document.getElementById('quantity') ? parseInt(document.getElementById('quantity').value) : 1;
             const size = document.getElementById('size') ? document.getElementById('size').value : null;
             
+            // Asegúrate de que quantity sea 1 si no está definido o es NaN
+            const safeQuantity = isNaN(quantity) ? 1 : quantity;
+
             // Usar la función global addToCart
-            window.addToCart(productId, productName, productPrice, productImage, quantity, size);
+            window.addToCart(productId, productName, productPrice, productImage, safeQuantity, size);
         });
     }
     
@@ -64,8 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const quantity = document.getElementById('quantity') ? parseInt(document.getElementById('quantity').value) : 1;
             const size = document.getElementById('size') ? document.getElementById('size').value : null;
             
+            // Asegúrate de que quantity sea 1 si no está definido o es NaN
+            const safeQuantity = isNaN(quantity) ? 1 : quantity;
+            
             // Añadir al carrito y redirigir al checkout
-            window.addToCart(productId, productName, productPrice, productImage, quantity, size);
+            window.addToCart(productId, productName, productPrice, productImage, safeQuantity, size);
             window.location.href = '/cart';
         });
     }

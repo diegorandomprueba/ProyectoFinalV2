@@ -5,6 +5,13 @@
 const cart = {
     items: [],
     
+    // Variable para almacenar el último ID de producto añadido y su timestamp
+    lastAddedProduct: {
+        id: null,
+        timestamp: 0,
+        cartItemId: null
+    },
+    
     init() {
         console.log('Cart initialized'); // Para depurar
         
@@ -37,24 +44,6 @@ const cart = {
             console.log('Rendering cart page'); // Para depurar
             this.renderCartPage();
         }
-        
-        // Inicializar eventos para los botones de añadir al carrito
-        document.addEventListener('click', event => {
-            if (event.target.closest('.add-to-cart-btn')) {
-                const button = event.target.closest('.add-to-cart-btn');
-                event.preventDefault();
-                
-                const productId = button.getAttribute('data-id');
-                const productName = button.getAttribute('data-name');
-                const productPrice = parseFloat(button.getAttribute('data-price'));
-                const productImage = button.getAttribute('data-image');
-                
-                console.log('Adding to cart:', { productId, productName, productPrice }); // Para depurar
-                
-                this.addItem(productId, productName, productPrice, productImage, 1);
-                showNotification('Producto añadido al carrito');
-            }
-        });
         
         // Agregar manejador de eventos para los botones de la página del carrito
         this.attachCartEvents();
@@ -121,6 +110,21 @@ const cart = {
     },
     
     addItem(id, name, price, image, quantity = 1, size = null) {
+        // Implementación del mecanismo de debounce
+        const now = Date.now();
+        const cartItemId = size ? `${id}-${size}` : `${id}`;
+        
+        // Verificar si es el mismo item añadido en menos de 500ms (evita la doble adición)
+        if (cartItemId === this.lastAddedProduct.cartItemId && (now - this.lastAddedProduct.timestamp) < 500) {
+            console.log('Preventing duplicate add to cart within 500ms for:', name);
+            return false;
+        }
+        
+        // Actualizar el último producto añadido
+        this.lastAddedProduct.id = id;
+        this.lastAddedProduct.cartItemId = cartItemId;
+        this.lastAddedProduct.timestamp = now;
+        
         // Validar datos
         if (!id || !name || typeof price !== 'number' || !image || isNaN(price)) {
             console.error('Invalid item data:', { id, name, price, image, quantity });
@@ -349,7 +353,7 @@ function showNotification(message, type = 'success') {
 
 // Función global para añadir al carrito (para usar desde cualquier página)
 function addToCart(productId, productName, productPrice, productImage, quantity = 1, size = null) {
-    console.log('Global addToCart called:', { productId, productName, productPrice }); // Para depurar
+    console.log('Adding to cart:', { productId, productName, productPrice }); // Para depurar
     
     // Convertir precio a número para asegurar que sea el tipo correcto
     const price = parseFloat(productPrice);
