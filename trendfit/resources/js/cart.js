@@ -13,6 +13,16 @@ const cart = {
         if (storedCart) {
             try {
                 this.items = JSON.parse(storedCart);
+                
+                // Verificar que cada item tiene la estructura correcta
+                this.items = this.items.filter(item => {
+                    // Verificar que los campos requeridos existen
+                    return item && item.id && item.name && 
+                           typeof item.price === 'number' && 
+                           item.image && 
+                           typeof item.quantity === 'number';
+                });
+                
                 this.updateCartCount();
                 console.log('Cart loaded from localStorage:', this.items); // Para depurar
             } catch (e) {
@@ -45,9 +55,78 @@ const cart = {
                 showNotification('Producto añadido al carrito');
             }
         });
+        
+        // Agregar manejador de eventos para los botones de la página del carrito
+        this.attachCartEvents();
+    },
+    
+    // Nuevo método para adjuntar eventos relacionados con el carrito
+    attachCartEvents() {
+        const self = this;  // Almacenar referencia a 'this' para usar en manejadores de eventos
+        
+        // Usar delegación de eventos para capturar clics en cualquier parte del documento
+        document.addEventListener('click', function(event) {
+            // Si estamos en la página del carrito y se hace clic en un botón de cantidad
+            if (window.location.pathname === '/cart' && event.target.classList.contains('quantity-btn')) {
+                const button = event.target;
+                const itemId = button.getAttribute('data-item-id');
+                const action = button.getAttribute('data-action');
+                const input = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
+                
+                if (!input) return;
+                
+                let quantity = parseInt(input.value) || 1;
+                
+                if (action === 'increase') {
+                    quantity++;
+                } else if (action === 'decrease' && quantity > 1) {
+                    quantity--;
+                }
+                
+                input.value = quantity;
+                self.updateQuantity(itemId, quantity);
+                self.renderCartPage();
+            }
+            
+            // Si estamos en la página del carrito y se hace clic en el botón de eliminar
+            if (window.location.pathname === '/cart' && 
+                (event.target.classList.contains('remove-btn') || event.target.closest('.remove-btn'))) {
+                const button = event.target.classList.contains('remove-btn') ? 
+                              event.target : event.target.closest('.remove-btn');
+                const itemId = button.getAttribute('data-item-id');
+                
+                if (itemId) {
+                    self.removeItem(itemId);
+                    self.renderCartPage();
+                }
+            }
+        });
+        
+        // Evento para cambios en los inputs de cantidad
+        document.addEventListener('change', function(event) {
+            if (window.location.pathname === '/cart' && event.target.classList.contains('quantity-input')) {
+                const input = event.target;
+                const itemId = input.getAttribute('data-item-id');
+                let quantity = parseInt(input.value);
+                
+                if (isNaN(quantity) || quantity < 1) {
+                    quantity = 1;
+                    input.value = 1;
+                }
+                
+                self.updateQuantity(itemId, quantity);
+                self.renderCartPage();
+            }
+        });
     },
     
     addItem(id, name, price, image, quantity = 1, size = null) {
+        // Validar datos
+        if (!id || !name || typeof price !== 'number' || !image || isNaN(price)) {
+            console.error('Invalid item data:', { id, name, price, image, quantity });
+            return false;
+        }
+        
         // Crear un ID único para productos con tallas
         const itemId = size ? `${id}-${size}` : `${id}`;
         
@@ -114,7 +193,12 @@ const cart = {
     },
     
     getTotal() {
-        return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+        return this.items.reduce((total, item) => {
+            // Asegurarse de que price y quantity son números
+            const price = parseFloat(item.price) || 0;
+            const quantity = parseInt(item.quantity) || 0;
+            return total + (price * quantity);
+        }, 0);
     },
     
     getTotalWithTax() {
@@ -122,7 +206,10 @@ const cart = {
     },
     
     getTotalItems() {
-        return this.items.reduce((total, item) => total + item.quantity, 0);
+        return this.items.reduce((total, item) => {
+            const quantity = parseInt(item.quantity) || 0;
+            return total + quantity;
+        }, 0);
     },
     
     saveCart() {
@@ -156,7 +243,7 @@ const cart = {
         const cartSummary = document.getElementById('cart-summary');
         
         if (!cartContainer) {
-            console.log('Cart container not found'); // Para depurar
+            console.error('Cart container not found'); // Para depurar
             return;
         }
         
@@ -176,6 +263,15 @@ const cart = {
         console.log('Rendering cart items:', this.items); // Para depurar
         
         this.items.forEach(item => {
+            // Verificar que el elemento tiene todos los campos necesarios
+            if (!item.id || !item.name || typeof item.price !== 'number' || !item.image) {
+                console.error('Invalid item in cart:', item);
+                return;
+            }
+            
+            const itemPrice = parseFloat(item.price);
+            const itemQuantity = parseInt(item.quantity) || 1;
+            
             const itemElement = document.createElement('div');
             itemElement.className = 'flex flex-col sm:flex-row items-center py-4 border-b';
             itemElement.innerHTML = `
@@ -184,13 +280,13 @@ const cart = {
                 </div>
                 <div class="flex-1 sm:ml-4">
                     <h3 class="font-semibold">${item.name}</h3>
-                    <p class="text-gray-600">${item.price.toFixed(2)}€</p>
+                    <p class="text-gray-600">${itemPrice.toFixed(2)}€</p>
                     ${item.size ? `<p class="text-gray-500 text-sm">Talla: ${item.size}</p>` : ''}
                 </div>
                 <div class="flex items-center mt-4 sm:mt-0">
                     <div class="flex items-center border rounded">
                         <button type="button" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 quantity-btn" data-action="decrease" data-item-id="${item.itemId}">-</button>
-                        <input type="number" class="w-12 text-center border-x quantity-input" value="${item.quantity}" min="1" data-item-id="${item.itemId}">
+                        <input type="number" class="w-12 text-center border-x quantity-input" value="${itemQuantity}" min="1" data-item-id="${item.itemId}">
                         <button type="button" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 quantity-btn" data-action="increase" data-item-id="${item.itemId}">+</button>
                     </div>
                     <button type="button" class="ml-4 text-red-500 hover:text-red-700 remove-btn" data-item-id="${item.itemId}">
@@ -198,7 +294,7 @@ const cart = {
                     </button>
                 </div>
                 <div class="font-semibold text-right mt-4 sm:mt-0 sm:ml-4 sm:w-24">
-                    ${(item.price * item.quantity).toFixed(2)}€
+                    ${(itemPrice * itemQuantity).toFixed(2)}€
                 </div>
             `;
             
@@ -217,59 +313,6 @@ const cart = {
             
             console.log('Totals updated:', { subtotal, tax, total }); // Para depurar
         }
-        
-        // Agregar eventos a los botones después de renderizar
-        this.attachCartEvents();
-    },
-    
-    // Nueva función para adjuntar eventos a los elementos del carrito
-    attachCartEvents() {
-        const self = this;  // Para mantener la referencia al objeto cart dentro de los manejadores de eventos
-        
-        // Eventos para botones de cantidad
-        document.querySelectorAll('.quantity-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const itemId = this.getAttribute('data-item-id');
-                const action = this.getAttribute('data-action');
-                const input = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
-                let quantity = parseInt(input.value);
-                
-                if (action === 'increase') {
-                    quantity++;
-                } else if (action === 'decrease' && quantity > 1) {
-                    quantity--;
-                }
-                
-                input.value = quantity;
-                self.updateQuantity(itemId, quantity);
-                self.renderCartPage();
-            });
-        });
-        
-        // Eventos para inputs de cantidad
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            input.addEventListener('change', function() {
-                const itemId = this.getAttribute('data-item-id');
-                let quantity = parseInt(this.value);
-                
-                if (isNaN(quantity) || quantity < 1) {
-                    quantity = 1;
-                    this.value = 1;
-                }
-                
-                self.updateQuantity(itemId, quantity);
-                self.renderCartPage();
-            });
-        });
-        
-        // Eventos para botones de eliminar
-        document.querySelectorAll('.remove-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const itemId = this.getAttribute('data-item-id');
-                self.removeItem(itemId);
-                self.renderCartPage();
-            });
-        });
     }
 };
 
@@ -307,7 +350,15 @@ function showNotification(message, type = 'success') {
 // Función global para añadir al carrito (para usar desde cualquier página)
 function addToCart(productId, productName, productPrice, productImage, quantity = 1, size = null) {
     console.log('Global addToCart called:', { productId, productName, productPrice }); // Para depurar
-    cart.addItem(productId, productName, productPrice, productImage, quantity, size);
+    
+    // Convertir precio a número para asegurar que sea el tipo correcto
+    const price = parseFloat(productPrice);
+    if (isNaN(price)) {
+        console.error('Invalid price:', productPrice);
+        return;
+    }
+    
+    cart.addItem(productId, productName, price, productImage, quantity, size);
     showNotification('Producto añadido al carrito', 'success');
 }
 

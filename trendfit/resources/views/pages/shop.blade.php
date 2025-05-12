@@ -222,10 +222,11 @@
                                     </div>
                                     
                                     <button 
-                                    class="add-to-cart-btn w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition duration-200"                                        data-product-id="{{ $producto->id }}"
-                                        data-product-name="{{ $producto->name }}"
-                                        data-product-price="{{ $producto->price }}"
-                                        data-product-image="{{ asset('storage/' . $producto->image) }}"
+                                        class="add-to-cart-btn w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition duration-200"
+                                        data-id="{{ $producto->id }}"
+                                        data-name="{{ $producto->name }}"
+                                        data-price="{{ $producto->price }}"
+                                        data-image="{{ asset('storage/' . $producto->image) }}"
                                     >
                                         <i class="fas fa-shopping-cart mr-2"></i> Añadir al Carrito
                                     </button>

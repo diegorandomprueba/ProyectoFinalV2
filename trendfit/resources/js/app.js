@@ -4,7 +4,7 @@ window.Alpine = Alpine;
 Alpine.start();
 
 // Import our custom scripts
-import './bootstrap.js';
+
 import './cart.js';
 import './validation.js';
 import './product.js';
