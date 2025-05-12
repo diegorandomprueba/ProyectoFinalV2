@@ -6,6 +6,7 @@ use App\Models\Producto;
 use App\Models\Categoria;
 use App\Services\OpinionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
 {
@@ -65,40 +66,49 @@ class HomeController extends Controller
         return view('pages.contact');
     }
     
+    public function editProfile()
+    {
+        $user = auth()->user();
+        return view('profile.profile', compact('user'));
+    }
+
     public function profile()
     {
         $user = auth()->user();
-        return view('pages.profile', compact('user'));
+        return view('pages.profile-view', compact('user'));
     }
-    
+
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
         
-        $validated = $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:255',
-            'birth_date' => 'nullable|date',
-            'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'postal_code' => 'nullable|string|max:255',
-            'province' => 'nullable|string|max:255',
-            'current_password' => 'nullable|required_with:password|password',
             'password' => 'nullable|string|min:8|confirmed',
-        ]);
+        ];
         
+        // Si está enviando una nueva contraseña, valida la contraseña actual
+        if ($request->filled('password')) {
+            $rules['current_password'] = 'required';
+        }
+        
+        $validated = $request->validate($rules);
+        
+        // Validar manualmente la contraseña actual si está intentando cambiarla
+        if ($request->filled('password') && !Hash::check($request->current_password, $user->password)) {
+            return redirect()->back()
+                ->withErrors(['current_password' => 'La contraseña actual no es correcta'])
+                ->withInput($request->except('password', 'password_confirmation'));
+        }
+        
+        // Actualizar información básica
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->phone = $validated['phone'] ?? $user->phone;
-        $user->birth_date = $validated['birth_date'] ?? $user->birth_date;
-        $user->address = $validated['address'] ?? $user->address;
-        $user->city = $validated['city'] ?? $user->city;
-        $user->postal_code = $validated['postal_code'] ?? $user->postal_code;
-        $user->province = $validated['province'] ?? $user->province;
         
+        // Actualizar contraseña si se proporciona
         if ($request->filled('password')) {
-            $user->password = bcrypt($validated['password']);
+            $user->password = Hash::make($validated['password']);
         }
         
         $user->save();
@@ -151,5 +161,29 @@ class HomeController extends Controller
     public function privacy()
     {
         return view('pages.legal.privacy');
+    }
+
+    public function destroyProfile(Request $request)
+    {
+        $request->validate([
+            'password' => 'required',
+        ]);
+
+        $user = auth()->user();
+        
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->withErrors([
+                'password' => 'La contraseña proporcionada no es correcta.',
+            ]);
+        }
+
+        Auth::logout();
+        
+        $user->delete();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect('/')->with('success', 'Tu cuenta ha sido eliminada correctamente');
     }
 }

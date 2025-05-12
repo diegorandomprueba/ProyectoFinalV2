@@ -45,7 +45,9 @@ Route::middleware(['auth'])->group(function () {
     
     // Perfil de usuario - Usar una sola versión del controlador de perfil
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
+    Route::get('/profile/edit', [HomeController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile/update', [HomeController::class, 'updateProfile'])->name('profile.update');
+    Route::delete('/profile/destroy', [HomeController::class, 'destroyProfile'])->name('profile.destroy');
     
     // Pedidos
     Route::get('/orders', [HomeController::class, 'orders'])->name('orders');
