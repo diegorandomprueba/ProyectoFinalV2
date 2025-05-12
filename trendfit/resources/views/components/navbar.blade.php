@@ -3,7 +3,7 @@
         <a href="{{ route('home') }}" class="text-2xl font-bold text-orange-500">Trendfit</a>
         <ul class="flex space-x-6">
             <li><a href="{{ route('home') }}" class="hover:text-orange-500">Portada</a></li>
-            <li><a href="{{ route('about') }}" class="hover:text-orange-500">Quien Somos</a></li>
+            <li><a href="{{ route('about') }}" class="hover:text-orange-500">Presentacion</a></li>
             <li><a href="{{ route('where') }}" class="hover:text-orange-500">Donde Estamos</a></li>
             @guest
                 <li><a href="{{ route('register') }}" class="hover:text-orange-500">Registro</a></li>
