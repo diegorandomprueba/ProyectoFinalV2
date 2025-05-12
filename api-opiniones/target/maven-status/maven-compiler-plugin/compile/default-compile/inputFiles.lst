@@ -1,0 +1,14 @@
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/App.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/config/SwaggerConfig.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/config/CorsConfig.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/exception/ResourceNotFoundException.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/dto/ProductRatingDTO.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/repository/OpinionRepository.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/service/OpinionServiceImpl.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/ApiOpinionesApplication.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/controller/OpinionController.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/dto/OpinionDTO.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/service/OpinionService.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/exception/GlobalExceptionHandler.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/exception/ErrorResponse.java
+/var/www/html/ProyectoTransversal_Final/api-opiniones/src/main/java/com/trendfit/model/Opinion.java

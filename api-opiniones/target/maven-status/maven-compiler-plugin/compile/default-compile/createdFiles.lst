@@ -1,0 +1,14 @@
+com/trendfit/service/OpinionServiceImpl.class
+com/trendfit/model/Opinion.class
+com/trendfit/config/CorsConfig.class
+com/trendfit/dto/OpinionDTO.class
+com/trendfit/dto/ProductRatingDTO.class
+com/trendfit/service/OpinionService.class
+com/trendfit/ApiOpinionesApplication.class
+com/trendfit/repository/OpinionRepository.class
+com/trendfit/controller/OpinionController.class
+com/trendfit/exception/ResourceNotFoundException.class
+com/trendfit/exception/ErrorResponse.class
+com/trendfit/config/SwaggerConfig.class
+com/trendfit/App.class
+com/trendfit/exception/GlobalExceptionHandler.class
