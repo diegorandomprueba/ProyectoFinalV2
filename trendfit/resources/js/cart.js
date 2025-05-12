@@ -280,7 +280,7 @@ const cart = {
             itemElement.className = 'flex flex-col sm:flex-row items-center py-4 border-b';
             itemElement.innerHTML = `
                 <div class="sm:w-24 h-24 flex-shrink-0 mb-4 sm:mb-0">
-                    <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover rounded">
+                    <img src="img/product/${item.image}" alt="${item.name}" class="w-full h-full object-cover rounded">
                 </div>
                 <div class="flex-1 sm:ml-4">
                     <h3 class="font-semibold">${item.name}</h3>

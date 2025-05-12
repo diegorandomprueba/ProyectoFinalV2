@@ -198,7 +198,7 @@
                                 <a href="{{ route('product.show', $producto->id) }}" class="block">
                                     <div class="w-full h-56 mb-4 overflow-hidden bg-gray-100 rounded-lg">
                                         @if($producto->image)
-                                            <img src="{{ asset('storage/' . $producto->image) }}" alt="{{ $producto->name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                                            <img src="{{ asset('img/product/' . $producto->image) }}" alt="{{ $producto->name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center bg-gray-200">
                                                 <span class="text-gray-400 text-4xl">
@@ -226,7 +226,7 @@
                                         data-id="{{ $producto->id }}"
                                         data-name="{{ $producto->name }}"
                                         data-price="{{ $producto->price }}"
-                                        data-image="{{ asset('storage/' . $producto->image) }}"
+                                        data-image="{{ asset('img/product/' . $producto->image) }}"
                                     >
                                         <i class="fas fa-shopping-cart mr-2"></i> Añadir al Carrito
                                     </button>

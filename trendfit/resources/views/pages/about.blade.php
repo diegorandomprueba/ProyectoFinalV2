@@ -52,15 +52,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-lg shadow-md text-center">
                 <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4">
-                    <img src="{{ asset('img/about/team1.jpg') }}" alt="CEO" class="w-full h-full object-cover">
+                    <img src="{{ asset('img/about/team.png') }}" alt="CEO" class="w-full h-full object-cover">
                 </div>
-                <h3 class="text-xl font-semibold">Sara Martínez</h3>
+                <h3 class="text-xl font-semibold">Diego Pallares</h3>
                 <p class="text-gray-600">CEO &amp; Fundadora</p>
             </div>
             
             <div class="bg-white p-6 rounded-lg shadow-md text-center">
                 <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4">
-                    <img src="{{ asset('img/about/team2.jpg') }}" alt="Director Creativo" class="w-full h-full object-cover">
+                    <img src="{{ asset('img/about/team.png') }}" alt="Director Creativo" class="w-full h-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold">Carlos Rodríguez</h3>
                 <p class="text-gray-600">Director Creativo</p>
@@ -68,7 +68,7 @@
             
             <div class="bg-white p-6 rounded-lg shadow-md text-center">
                 <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4">
-                    <img src="{{ asset('img/about/team3.jpg') }}" alt="Directora de Tecnología" class="w-full h-full object-cover">
+                    <img src="{{ asset('img/about/team.png') }}" alt="Directora de Tecnología" class="w-full h-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold">Laura Gómez</h3>
                 <p class="text-gray-600">Directora de Tecnología</p>

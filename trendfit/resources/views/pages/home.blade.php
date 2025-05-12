@@ -19,9 +19,6 @@
                         </a>
                     </div>
                 </div>
-                <div class="md:w-1/2">
-                    <img src="{{ asset('img/hero-image.jpg') }}" alt="Trendfit Moda" class="rounded-lg shadow-lg">
-                </div>
             </div>
         </div>
     </section>
@@ -55,7 +52,7 @@
                 @foreach($popularCategories as $category)
                     <a href="{{ route('shop', ['categoria' => $category->id]) }}" class="group">
                         <div class="relative overflow-hidden rounded-lg shadow-md h-64">
-                            <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="{{ asset('img/category/' . $category->name . '.png') }}" alt="{{ $category->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                                 <h3 class="text-white text-2xl font-bold">{{ $category->name }}</h3>
                             </div>
@@ -80,7 +77,7 @@
                                 <div class="bg-white p-4 shadow-md rounded-lg flex flex-col items-center text-center h-full">
                                     <a href="{{ route('product.show', $product->id) }}" class="block">
                                         <div class="w-full h-48 flex items-center justify-center overflow-hidden bg-gray-100">
-                                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="h-full w-auto">
+                                            <img src="{{ asset('img/product/' . $product->image) }}" alt="{{ $product->name }}" class="h-full w-auto">
                                         </div>
                                         <h3 class="text-xl font-semibold mt-2">{{ $product->name }}</h3>
                                         <div class="flex justify-center mt-1 mb-2">
