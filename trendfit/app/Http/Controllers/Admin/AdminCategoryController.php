@@ -11,14 +11,23 @@ use Illuminate\Support\Facades\Auth;
 class AdminCategoryController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
         // Verificar si el usuario es administrador
         if (!Auth::user()->isAdmin) {
             return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
         }
-
-        $categories = Categoria::paginate(20);
+    
+        $query = Categoria::query();
+        
+        // Aplicar filtro de búsqueda si existe
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('descr', 'like', "%{$search}%");
+        }
+        
+        $categories = $query->paginate(20);
         return view('admin.categories.index', compact('categories'));
     }
     
@@ -40,7 +49,7 @@ class AdminCategoryController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:categorias',
+            'name' => 'required|string|max:255|unique:categoria',
             'descr' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -78,7 +87,7 @@ class AdminCategoryController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:categorias,name,' . $id,
+            'name' => 'required|string|max:255|unique:categoria,name,' . $id,
             'descr' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);

@@ -46,22 +46,7 @@
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    
-                    <div>
-                        <label for="phone" class="block text-gray-700 font-medium mb-2">Teléfono</label>
-                        <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 @error('phone') border-red-500 @enderror">
-                        @error('phone')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-                
-                <div class="mb-6">
-                    <label for="birth_date" class="block text-gray-700 font-medium mb-2">Fecha de nacimiento</label>
-                    <input type="date" id="birth_date" name="birth_date" value="{{ old('birth_date', $user->birth_date ? $user->birth_date->format('Y-m-d') : '') }}" class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 @error('birth_date') border-red-500 @enderror">
-                    @error('birth_date')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+
                 </div>
                 
                 <div class="mb-6">

@@ -91,7 +91,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $user->created_at->format('d/m/Y H:i') }}
+                            {{ $user->created_at ? $user->created_at->format('d/m/Y H:i') : 'Fecha no disponible' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <div class="flex space-x-2">

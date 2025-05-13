@@ -83,7 +83,7 @@ class AdminProductController extends Controller
             'descr' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'idCategoria' => 'required|exists:subcategorias,id',
+            'idCategoria' => 'required|exists:subcategoria,id',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
@@ -129,7 +129,7 @@ class AdminProductController extends Controller
             'descr' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'idCategoria' => 'required|exists:subcategorias,id',
+            'idCategoria' => 'required|exists:subcategoria,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         

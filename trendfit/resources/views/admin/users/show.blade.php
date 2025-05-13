@@ -59,12 +59,12 @@
                 
                 <div>
                     <p class="text-gray-600 font-medium">Fecha de registro:</p>
-                    <p class="text-gray-900">{{ $user->created_at->format('d/m/Y H:i') }}</p>
+                    <p class="text-gray-900">{{ $user->created_at ? $user->created_at->format('d/m/Y H:i') : 'Fecha no disponible' }}</p>
                 </div>
                 
                 <div>
                     <p class="text-gray-600 font-medium">Última actualización:</p>
-                    <p class="text-gray-900">{{ $user->updated_at->format('d/m/Y H:i') }}</p>
+                    <p class="text-gray-900">{{ $user->created_at ? $user->created_at->format('d/m/Y H:i') : 'Fecha no disponible' }}</p>
                 </div>
             </div>
             
@@ -109,7 +109,7 @@
                                         {{ $order->id }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $order->created_at->format('d/m/Y H:i') }}
+                                        {{ $order->created_at ? $order->created_at->format('d/m/Y H:i') : 'Fecha no disponible' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
