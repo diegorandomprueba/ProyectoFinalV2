@@ -144,7 +144,7 @@
             </a>
             
             <p class="text-gray-600 mt-4">
-                Hemos enviado un correo electrónico con la confirmación a {{ $order->user->email }}.
+                Hemos enviado un correo electrónico con la confirmación a {{ $order->user->email ?? 'Email no disponible' }}.
             </p>
             
             <div class="mt-6">

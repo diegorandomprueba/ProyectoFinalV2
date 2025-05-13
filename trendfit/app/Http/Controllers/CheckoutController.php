@@ -53,6 +53,8 @@ class CheckoutController extends Controller
     // En el método process de CheckoutController.php
     public function process(Request $request)
     {
+        \Log::info('Datos del formulario: ' . json_encode($request->all()));
+        
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Debes iniciar sesión para finalizar la compra.');
         }

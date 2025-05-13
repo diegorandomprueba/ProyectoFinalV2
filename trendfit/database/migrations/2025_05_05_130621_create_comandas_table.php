@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('provincia');
             $table->string('codigo_postal');
             $table->date('date');
+            $table->string('phone');
+            $table->string('status');
+            $table->string('payment_method');
+            $table->integer('total');
             $table->foreign('idUsuari')->references('id')->on('users');
             $table->timestamps();
         });

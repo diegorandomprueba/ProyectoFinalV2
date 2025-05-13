@@ -51,52 +51,6 @@
                     </div>
                 </div>
                 
-                <!-- Información de facturación -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-semibold mb-4 pb-2 border-b">Información de Facturación</h3>
-                    
-                    <div class="mb-4">
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" id="same_as_shipping" name="same_as_shipping" class="form-checkbox h-5 w-5 text-orange-500" checked>
-                            <span class="ml-2 text-gray-700">Usar la misma dirección de entrega</span>
-                        </label>
-                    </div>
-                    
-                    <div id="billing-info" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-                        <div>
-                            <label for="billing_name" class="block text-gray-700 font-medium mb-2">Nombre Completo</label>
-                            <input type="text" id="billing_name" name="billing_name" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        </div>
-                        
-                        <div>
-                            <label for="billing_phone" class="block text-gray-700 font-medium mb-2">Teléfono</label>
-                            <input type="tel" id="billing_phone" name="billing_phone" pattern="[0-9]{9,10}" maxlength="10" title="Introduce un número de teléfono válido (solo números, máximo 10 dígitos)" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <p class="text-sm text-gray-500 mt-1">Solo números, máximo 10 dígitos</p>
-                        </div>
-                        
-                        <div class="md:col-span-2">
-                            <label for="billing_address" class="block text-gray-700 font-medium mb-2">Dirección</label>
-                            <input type="text" id="billing_address" name="billing_address" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        </div>
-                        
-                        <div>
-                            <label for="billing_city" class="block text-gray-700 font-medium mb-2">Ciudad</label>
-                            <input type="text" id="billing_city" name="billing_city" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        </div>
-                        
-                        <div>
-                            <label for="billing_code" class="block text-gray-700 font-medium mb-2">Código Postal</label>
-                            <input type="text" id="billing_code" name="billing_code" pattern="[0-9]{5}" maxlength="5" title="El código postal debe tener 5 dígitos" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <p class="text-sm text-gray-500 mt-1">5 dígitos numéricos</p>
-                        </div>
-                        
-                        <div class="md:col-span-2">
-                            <label for="billing_province" class="block text-gray-700 font-medium mb-2">Provincia</label>
-                            <input type="text" id="billing_province" name="billing_province" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Información de pago -->
                 <div>
                     <h3 class="text-xl font-semibold mb-4 pb-2 border-b">Método de Pago</h3>

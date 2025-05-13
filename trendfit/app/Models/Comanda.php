@@ -19,7 +19,11 @@ class Comanda extends Model
         'city', 
         'provincia', 
         'codigo_postal', 
-        'date'
+        'date',
+        'phone',
+        'status',
+        'payment_method',
+        'total',
     ];
 
     public function user()
