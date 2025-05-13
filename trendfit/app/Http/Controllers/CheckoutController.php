@@ -2,216 +2,129 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comanda;
-use App\Models\ComandaProd;
-use App\Models\Producto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OrderConfirmation;
-use PDF;
 
 class CheckoutController extends Controller
 {
-    
     public function index()
     {
-        // Obtener los items del carrito
-        $cartItems = $this->getCartItems();
+        // Recuperar los items del carrito desde la sesión o localStorage
+        // Esto dependerá de tu implementación específica
         
-        // Si el carrito está vacío, redirigir al carrito
-        if (count($cartItems) === 0) {
-            return redirect()->route('cart')->with('error', 'Tu carrito está vacío');
-        }
-        
-        // Calcular totales
+        $cartItems = [];
         $subtotal = 0;
-        foreach ($cartItems as $item) {
-            $subtotal += $item['product']->price * $item['quantity'];
-        }
-        
-        // Aplicar descuento si hay un cupón
+        $tax = 0;
+        $shipping = 4.99;
         $discount = 0;
-        if (session()->has('coupon')) {
-            $coupon = session()->get('coupon');
-            $discount = ($subtotal * $coupon['discount']) / 100;
+        $total = 0;
+        
+        // Aquí necesitamos acceder a la información del carrito
+        // Como el carrito está implementado en JavaScript y se almacena en localStorage,
+        // necesitamos pasar estos datos desde el cliente al servidor
+        
+        // La forma más sencilla es almacenar en la sesión cuando el usuario hace clic en "Checkout"
+        if (session()->has('cart_items')) {
+            $cartItemsData = session('cart_items');
+            
+            // Recuperar los productos de la base de datos para asegurar precios correctos
+            foreach ($cartItemsData as $item) {
+                $product = \App\Models\Producto::find($item['id']);
+                
+                if ($product) {
+                    $cartItems[] = [
+                        'product' => $product,
+                        'quantity' => $item['quantity'],
+                        'size' => $item['size'] ?? null
+                    ];
+                    
+                    $subtotal += $product->price * $item['quantity'];
+                }
+            }
+            
+            $tax = $subtotal * 0.21;
+            $total = $subtotal + $tax + $shipping - $discount;
         }
         
-        $tax = ($subtotal - $discount) * 0.21; // IVA del 21%
-        $shipping = 4.99; // Costo de envío fijo
-        $total = ($subtotal - $discount) + $tax + $shipping;
-        
-        return view('pages.checkout', compact('cartItems', 'subtotal', 'discount', 'tax', 'shipping', 'total'));
+        return view('checkout', compact('cartItems', 'subtotal', 'tax', 'shipping', 'discount', 'total'));
     }
     
     public function process(Request $request)
     {
-        // Validar los datos del formulario
-        $validated = $request->validate([
-            'shipping_name' => 'required|string|max:255',
-            'shipping_phone' => 'required|string|max:20',
-            'shipping_address' => 'required|string|max:255',
-            'shipping_city' => 'required|string|max:255',
-            'shipping_code' => 'required|string|max:10',
-            'shipping_province' => 'required|string|max:255',
+        // Validación de datos
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'provincia' => 'required|string|max:255',
+            'codigo_postal' => 'required|string|max:10',
             'payment_method' => 'required|in:card,paypal,transfer',
-            'card_number' => 'required_if:payment_method,card|nullable|string',
-            'card_name' => 'required_if:payment_method,card|nullable|string',
-            'card_expiry' => 'required_if:payment_method,card|nullable|string',
-            'card_cvv' => 'required_if:payment_method,card|nullable|string',
         ]);
         
-        // Obtener los items del carrito
-        $cartItems = $this->getCartItems();
-        
-        // Si el carrito está vacío, redirigir al carrito
-        if (count($cartItems) === 0) {
-            return redirect()->route('cart')->with('error', 'Tu carrito está vacío');
-        }
-        
-        // Calcular totales
-        $subtotal = 0;
-        foreach ($cartItems as $item) {
-            $subtotal += $item['product']->price * $item['quantity'];
-        }
-        
-        // Aplicar descuento si hay un cupón
-        $discount = 0;
-        if (session()->has('coupon')) {
-            $coupon = session()->get('coupon');
-            $discount = ($subtotal * $coupon['discount']) / 100;
-        }
-        
-        $tax = ($subtotal - $discount) * 0.21; // IVA del 21%
-        $shipping = 4.99; // Costo de envío fijo
-        $total = ($subtotal - $discount) + $tax + $shipping;
-        
-        // Iniciar transacción para garantizar consistencia en la BD
-        DB::beginTransaction();
-        
-        try {
-            // Crear el pedido
-            $order = new Comanda();
-            $order->idUsuari = auth()->id();
-            $order->name = $validated['shipping_name'];
-            $order->address = $validated['shipping_address'];
-            $order->city = $validated['shipping_city'];
-            $order->codigo_postal = $validated['shipping_code'];
-            $order->provincia = $validated['shipping_province'];
-            $order->phone = $validated['shipping_phone'];
-            $order->payment_method = $validated['payment_method'];
-            $order->status = 'pending';
-            $order->total = $total;
-            $order->subtotal = $subtotal;
-            $order->tax = $tax;
-            $order->shipping = $shipping;
-            $order->discount = $discount;
-            
-            // Si el método de pago es tarjeta, guardamos los últimos 4 dígitos
-            if ($validated['payment_method'] === 'card') {
-                $order->card_number = substr(preg_replace('/\s+/', '', $validated['card_number']), -4);
-            }
-            
-            $order->date = now();
-            $order->save();
-            
-            // Guardar los productos del pedido
-            foreach ($cartItems as $item) {
-                $orderItem = new ComandaProd();
-                $orderItem->idComanda = $order->id;
-                $orderItem->idProducte = $item['product']->id;
-                $orderItem->cant = $item['quantity'];
-                $orderItem->price = $item['product']->price;
-                $orderItem->size = $item['size'];
-                $orderItem->has_to_comment = false; // Inicialmente no tiene valoración
-                $orderItem->save();
-                
-                // Actualizar el stock del producto
-                $product = Producto::find($item['product']->id);
-                $product->stock -= $item['quantity'];
-                $product->save();
-            }
-            
-            // Generar la factura en PDF
-            $pdf = PDF::loadView('pages.orders.invoice', [
-                'order' => $order,
-                'subtotal' => $subtotal,
-                'tax' => $tax,
-                'shipping' => $shipping,
-                'discount' => $discount,
-                'total' => $total
+        // Si es pago con tarjeta, validar los datos de la tarjeta
+        if ($request->payment_method === 'card') {
+            $request->validate([
+                'card_number' => 'required|string',
+                'card_name' => 'required|string',
+                'card_expiry' => 'required|string',
+                'card_cvv' => 'required|string',
             ]);
-            
-            // Guardar la factura
-            $invoicePath = 'invoices/' . $order->id . '.pdf';
-            Storage::put('public/' . $invoicePath, $pdf->output());
-            
-            // Actualizar el pedido con la ruta de la factura
-            $order->invoice_path = $invoicePath;
-            $order->save();
-            
-            // Enviar correo de confirmación
-            Mail::to(auth()->user()->email)->send(new OrderConfirmation($order));
-            
-            // Confirmar la transacción
-            DB::commit();
-            
-            // Limpiar el carrito y el cupón
-            session()->forget(['cart', 'coupon']);
-            
-            // Redirigir a la página de confirmación
-            return redirect()->route('checkout.success', ['order' => $order->id]);
-            
-        } catch (\Exception $e) {
-            // Si hay algún error, revertir la transacción
-            DB::rollBack();
-            
-            return redirect()->back()->with('error', 'Error al procesar el pedido: ' . $e->getMessage());
-        }
-    }
-    
-    public function success($orderId)
-    {
-        $order = Comanda::where('id', $orderId)
-                       ->where('idUsuari', auth()->id())
-                       ->firstOrFail();
-        
-        // Calcular subtotal, impuestos y envío
-        $subtotal = 0;
-        foreach ($order->products as $product) {
-            $subtotal += $product->price * $product->pivot->cant;
         }
         
-        $tax = $subtotal * 0.21;
-        $shipping = 4.99;
-        $discount = $order->discount ?? 0;
+        // Crear un nuevo pedido
+        $order = new \App\Models\Comanda();
+        $order->idUsuari = Auth::id();
+        $order->name = $request->name;
+        $order->address = $request->address;
+        $order->city = $request->city;
+        $order->provincia = $request->provincia;
+        $order->codigo_postal = $request->codigo_postal;
+        $order->status = 'pending';
+        $order->payment_method = $request->payment_method;
         
-        return view('pages.checkout.success', compact('order', 'subtotal', 'tax', 'shipping', 'discount'));
-    }
-    
-    private function getCartItems()
-    {
-        $cart = session()->get('cart', []);
-        $cartItems = [];
+        // Si es pago con tarjeta, guardar los últimos 4 dígitos
+        if ($request->payment_method === 'card') {
+            $order->card_number = substr($request->card_number, -4);
+        }
         
-        foreach ($cart as $item) {
-            $product = Producto::find($item['productId']);
+        $order->save();
+        
+        // Obtener los items del carrito y guardarlos en la tabla pivote
+        if (session()->has('cart_items')) {
+            $cartItems = session('cart_items');
             
-            if ($product && $product->stock > 0) {
-                // Ajustar la cantidad si es mayor que el stock disponible
-                if ($item['quantity'] > $product->stock) {
-                    $item['quantity'] = $product->stock;
-                }
+            foreach ($cartItems as $item) {
+                $product = \App\Models\Producto::find($item['id']);
                 
-                $cartItems[] = [
-                    'product' => $product,
-                    'quantity' => $item['quantity'],
-                    'size' => $item['size'],
-                ];
+                if ($product) {
+                    // Reducir el stock
+                    $product->stock -= $item['quantity'];
+                    $product->save();
+                    
+                    // Añadir al pedido
+                    $order->productes()->attach($product->id, [
+                        'cant' => $item['quantity'],
+                        'has_to_comment' => true
+                    ]);
+                }
             }
         }
         
-        return $cartItems;
+        // Limpiar el carrito
+        session()->forget('cart_items');
+        
+        return redirect()->route('checkout.success', ['id' => $order->id]);
+    }
+    
+    public function success($id)
+    {
+        $order = \App\Models\Comanda::with(['user', 'productes'])->findOrFail($id);
+        
+        // Verificar que el usuario autenticado es el propietario del pedido
+        if (Auth::id() !== $order->idUsuari) {
+            return redirect()->route('home')->with('error', 'No tienes permiso para ver este pedido');
+        }
+        
+        return view('success', compact('order'));
     }
 }

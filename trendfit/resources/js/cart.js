@@ -120,6 +120,9 @@ const cart = {
             return false;
         }
         
+        // Asegurar que la cantidad sea un número válido
+        quantity = parseInt(quantity) || 1;
+        
         // Actualizar el último producto añadido
         this.lastAddedProduct.id = id;
         this.lastAddedProduct.cartItemId = cartItemId;
@@ -142,7 +145,7 @@ const cart = {
         if (existingItemIndex !== -1) {
             // Actualizar cantidad si ya existe
             this.items[existingItemIndex].quantity += quantity;
-            console.log('Updated quantity for existing item', this.items[existingItemIndex]); // Para depurar
+            console.log('Updated quantity for existing item:', this.items[existingItemIndex]); // Para depurar
         } else {
             // Añadir nuevo producto
             this.items.push({
@@ -154,7 +157,7 @@ const cart = {
                 quantity,
                 size
             });
-            console.log('Added new item to cart', this.items[this.items.length - 1]); // Para depurar
+            console.log('Added new item to cart:', this.items[this.items.length - 1]); // Para depurar
         }
         
         this.saveCart();
@@ -370,6 +373,43 @@ function addToCart(productId, productName, productPrice, productImage, quantity 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing cart'); // Para depurar
     cart.init();
+    
+    // Agregar manejador de eventos para el botón de checkout
+    const checkoutButton = document.getElementById('checkout-button');
+    if (checkoutButton) {
+        checkoutButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Verificar si hay items en el carrito
+            if (cart.items.length === 0) {
+                showNotification('Tu carrito está vacío. Añade productos antes de finalizar la compra.', 'error');
+                return;
+            }
+            
+            // Sincronizar carrito con el servidor antes de navegar
+            fetch('/cart/sync', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    items: cart.items
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Navegar a la página de checkout
+                    window.location.href = checkoutButton.getAttribute('href');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al procesar la compra. Por favor, inténtalo de nuevo.', 'error');
+            });
+        });
+    }
 });
 
 // Exportar el objeto cart para usar desde otros archivos

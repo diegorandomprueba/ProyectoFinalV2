@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Manejo del contador de cantidad
-    const quantityInput = document.getElementById('quantity');
+    const quantityInput = document.getElementById('cantidad');
     if (quantityInput) {
         const decrementBtn = document.querySelector('.decrement-btn');
         const incrementBtn = document.querySelector('.increment-btn');
         
-        decrementBtn.addEventListener('click', function() {
+        decrementBtn?.addEventListener('click', function() {
             let value = parseInt(quantityInput.value);
             if (value > 1) {
                 quantityInput.value = value - 1;
             }
         });
         
-        incrementBtn.addEventListener('click', function() {
+        incrementBtn?.addEventListener('click', function() {
             let value = parseInt(quantityInput.value);
             let max = parseInt(quantityInput.getAttribute('max') || 999);
             if (value < max) {
@@ -34,13 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Botón de añadir al carrito SOLO para la página de detalles del producto
-    // Esta clase debe ser única para la página de detalles del producto
     const addToCartBtn = document.querySelector('.product-detail-add-to-cart');
     if (addToCartBtn) {
         console.log('Found add-to-cart button in product details page');
-        
-        // Marcar el botón para evitar duplicidad (por si acaso)
-        addToCartBtn.setAttribute('data-event-bound', 'true');
         
         addToCartBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -50,14 +46,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const productName = this.getAttribute('data-name');
             const productPrice = parseFloat(this.getAttribute('data-price'));
             const productImage = this.getAttribute('data-image');
-            const quantity = document.getElementById('quantity') ? parseInt(document.getElementById('quantity').value) : 1;
-            const size = document.getElementById('size') ? document.getElementById('size').value : null;
             
-            // Asegúrate de que quantity sea 1 si no está definido o es NaN
-            const safeQuantity = isNaN(quantity) ? 1 : quantity;
-
+            // Obtener la cantidad y talla seleccionadas
+            const quantity = document.getElementById('cantidad') ? parseInt(document.getElementById('cantidad').value) : 1;
+            const size = document.getElementById('selected-size') ? document.getElementById('selected-size').value : null;
+            
+            if (size === "") {
+                alert('Por favor, selecciona una talla');
+                return;
+            }
+            
             // Usar la función global addToCart
-            window.addToCart(productId, productName, productPrice, productImage, safeQuantity, size);
+            window.addToCart(productId, productName, productPrice, productImage, quantity, size);
         });
     }
     
@@ -71,14 +71,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const productName = this.getAttribute('data-name');
             const productPrice = parseFloat(this.getAttribute('data-price'));
             const productImage = this.getAttribute('data-image');
-            const quantity = document.getElementById('quantity') ? parseInt(document.getElementById('quantity').value) : 1;
-            const size = document.getElementById('size') ? document.getElementById('size').value : null;
             
-            // Asegúrate de que quantity sea 1 si no está definido o es NaN
-            const safeQuantity = isNaN(quantity) ? 1 : quantity;
+            // Obtener la cantidad y talla seleccionadas
+            const quantity = document.getElementById('cantidad') ? parseInt(document.getElementById('cantidad').value) : 1;
+            const size = document.getElementById('selected-size') ? document.getElementById('selected-size').value : null;
+            
+            if (size === "") {
+                alert('Por favor, selecciona una talla');
+                return;
+            }
             
             // Añadir al carrito y redirigir al checkout
-            window.addToCart(productId, productName, productPrice, productImage, safeQuantity, size);
+            window.addToCart(productId, productName, productPrice, productImage, quantity, size);
             window.location.href = '/cart';
         });
     }

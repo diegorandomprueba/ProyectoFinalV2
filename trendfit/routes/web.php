@@ -25,6 +25,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/where', [HomeController::class, 'where'])->name('where');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+// En routes/web.php
+Route::post('/cart/sync', [CartController::class, 'sync'])->name('cart.sync');
 
 // Rutas de autenticación (acceso público)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

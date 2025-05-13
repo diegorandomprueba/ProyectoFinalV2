@@ -20,6 +20,14 @@ class CartController extends Controller
         return view('pages.cart', compact('cartItems', 'totalPrice'));
     }
     
+    public function sync(Request $request)
+    {
+        $cartItems = $request->input('items', []);
+        session(['cart_items' => $cartItems]);
+        
+        return response()->json(['success' => true]);
+    }
+
     public function add(Request $request)
     {
         $request->validate([
