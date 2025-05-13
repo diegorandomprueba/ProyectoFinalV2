@@ -79,10 +79,10 @@
                             #{{ $order->id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $order->user->name }}
+                            {{ $order->name ? $order->name : 'Nombre no disponible' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $order->created_at->format('d/m/Y H:i') }}
+                            {{ $order->date ? $order->date : 'Fecha no disponible' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 

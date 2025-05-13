@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Producto;
+use App\Models\User;
 
 class Comanda extends Model
 {
@@ -27,7 +29,7 @@ class Comanda extends Model
 
     public function productes()
     {
-        return $this->belongsToMany(Producte::class, 'comanda_prod', 'idComanda', 'idProducte')
+        return $this->belongsToMany(Producto::class, 'comanda_prod', 'idComanda', 'idProducte')
             ->withPivot('cant', 'has_to_comment');
     }
 }

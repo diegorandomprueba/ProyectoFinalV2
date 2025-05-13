@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Opinion;
+use App\Models\Comanda;
+use App\Models\Subcategoria;
+
 
 class Producto extends Model
 {

@@ -15,23 +15,22 @@
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
         <div class="p-6">
             <h2 class="text-2xl font-semibold mb-2">Pedido #{{ $order->id }}</h2>
-            <p class="text-gray-600 mb-6">Realizado el {{ $order->created_at->format('d/m/Y H:i') }}</p>
+            <p class="text-gray-600 mb-6">Realizado el {{ $order->date }}</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                     <h3 class="text-lg font-semibold mb-2">Información del Cliente</h3>
-                    <p><strong>Nombre:</strong> {{ $order->user->name }}</p>
-                    <p><strong>Email:</strong> {{ $order->user->email }}</p>
-                    <p><strong>Teléfono:</strong> {{ $order->user->phone ?? 'No especificado' }}</p>
+                    <p><strong>Nombre:</strong> {{ $order->user->name ?? 'No especificado'}}</p>
+                    <p><strong>Email:</strong> {{ $order->user->email ?? 'No especificado'}}</p>
                 </div>
                 
                 <div>
                     <h3 class="text-lg font-semibold mb-2">Información de Envío</h3>
-                    <p><strong>Nombre:</strong> {{ $order->name }}</p>
-                    <p><strong>Dirección:</strong> {{ $order->address }}</p>
-                    <p><strong>Ciudad:</strong> {{ $order->city }}</p>
-                    <p><strong>Código Postal:</strong> {{ $order->codigo_postal }}</p>
-                    <p><strong>Provincia:</strong> {{ $order->provincia }}</p>
+                    <p><strong>Nombre:</strong> {{ $order->name ?? 'No especificado'}}</p>
+                    <p><strong>Dirección:</strong> {{ $order->address ?? 'No especificado'}}</p>
+                    <p><strong>Ciudad:</strong> {{ $order->city ?? 'No especificado'}}</p>
+                    <p><strong>Código Postal:</strong> {{ $order->codigo_postal ?? 'No especificado'}}</p>
+                    <p><strong>Provincia:</strong> {{ $order->provincia ?? 'No especificado'}}</p>
                 </div>
             </div>
             
@@ -83,9 +82,6 @@
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
-                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                                        </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900">
                                                 {{ $product->name }}

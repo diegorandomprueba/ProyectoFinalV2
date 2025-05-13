@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Producto;
+use App\Models\Comanda;
+
 
 class ComandaProd extends Model
 {
@@ -19,6 +22,6 @@ class ComandaProd extends Model
 
     public function producte()
     {
-        return $this->belongsTo(Producte::class, 'idProducte');
+        return $this->belongsTo(Producto::class, 'idProducte');
     }
 }

@@ -13,14 +13,34 @@ use Illuminate\Support\Facades\Auth;
 class AdminUserController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
         // Verificar si el usuario es administrador
         if (!Auth::user()->isAdmin) {
             return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
         }
-
-        $users = User::paginate(20);
+    
+        $query = User::query();
+        
+        // Aplicar filtro de búsqueda
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        // Aplicar filtro de rol
+        if ($request->has('role') && !empty($request->role)) {
+            if ($request->role === 'admin') {
+                $query->where('isAdmin', true);
+            } elseif ($request->role === 'client') {
+                $query->where('isAdmin', false);
+            }
+        }
+        
+        $users = $query->orderBy('created_at', 'desc')->paginate(20);
         return view('admin.users.index', compact('users'));
     }
     

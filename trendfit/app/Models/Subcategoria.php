@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Categoria;
+use App\Models\Producto;
+
 
 class Subcategoria extends Model
 {
@@ -19,6 +22,6 @@ class Subcategoria extends Model
 
     public function productes()
     {
-        return $this->hasMany(Producte::class, 'idCategoria');
+        return $this->hasMany(Producto::class, 'idCategoria');
     }
 }

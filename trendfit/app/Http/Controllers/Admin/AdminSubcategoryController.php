@@ -12,15 +12,28 @@ use Illuminate\Support\Facades\Auth;
 class AdminSubcategoryController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
         // Verificar si el usuario es administrador
         if (!Auth::user()->isAdmin) {
             return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
         }
-
-        $subcategories = Subcategoria::with('categoria')->paginate(20);
-        return view('admin.subcategories.index', compact('subcategories'));
+    
+        $query = Subcategoria::with('categoria');
+        
+        // Aplicar filtros
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+        
+        if ($request->has('category_id') && !empty($request->category_id)) {
+            $query->where('idCategoria', $request->category_id);
+        }
+        
+        $subcategories = $query->paginate(20);
+        $categories = Categoria::all(); // Añadir esta línea
+        
+        return view('admin.subcategories.index', compact('subcategories', 'categories'));
     }
     
     public function create()
@@ -44,7 +57,7 @@ class AdminSubcategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'descr' => 'nullable|string',
-            'idCategoria' => 'required|exists:categorias,id',
+            'idCategoria' => 'required|exists:categoria,id',
         ]);
         
         $subcategory = new Subcategoria();
@@ -78,7 +91,7 @@ class AdminSubcategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'descr' => 'nullable|string',
-            'idCategoria' => 'required|exists:categorias,id',
+            'idCategoria' => 'required|exists:categoria,id',
         ]);
         
         $subcategory = Subcategoria::findOrFail($id);
@@ -100,7 +113,7 @@ class AdminSubcategoryController extends Controller
         $subcategory = Subcategoria::findOrFail($id);
         
         // Comprobar si hay productos asociados a esta subcategoría
-        if ($subcategory->products()->exists()) {
+        if ($subcategory->productes()->exists()) {
             return redirect()->route('admin.subcategories.index')->with('error', 'No se puede eliminar la subcategoría porque tiene productos asociados');
         }
         
