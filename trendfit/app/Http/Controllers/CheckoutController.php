@@ -50,6 +50,7 @@ class CheckoutController extends Controller
         return view('pages.checkout', compact('cartItems', 'subtotal', 'tax', 'shipping', 'discount', 'total'));
     }
     
+    // En el método process de CheckoutController.php
     public function process(Request $request)
     {
         if (!Auth::check()) {
@@ -89,9 +90,7 @@ class CheckoutController extends Controller
             $order->phone = $request->shipping_phone;
             $order->status = 'pending';
             $order->payment_method = $request->payment_method;
-            
-            // Solo guardar el método de pago, sin detalles sensibles
-            // Eliminamos el almacenamiento de cualquier dato de la tarjeta
+            $order->date = now(); // Asegurarse de que la fecha se establece
             
             // Calcular el total del pedido
             $subtotal = 0;
@@ -144,7 +143,7 @@ class CheckoutController extends Controller
             
         } catch (\Exception $e) {
             // Registrar el error
-            Log::error('Error al procesar el pedido: ' . $e->getMessage());
+            \Log::error('Error al procesar el pedido: ' . $e->getMessage());
             
             // Redireccionar con mensaje de error
             return redirect()->back()->with('error', 'Ha ocurrido un error al procesar tu pedido. Por favor, inténtalo de nuevo.');

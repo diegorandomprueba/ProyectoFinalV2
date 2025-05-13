@@ -52,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
     // Checkout
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
-    Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout/success/{id}', [CheckoutController::class, 'success'])->name('checkout.success');
     
     // Perfil de usuario
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');

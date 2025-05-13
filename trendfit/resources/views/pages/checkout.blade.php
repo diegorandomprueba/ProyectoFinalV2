@@ -106,17 +106,17 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <label class="relative border rounded-lg p-4 flex flex-col items-center cursor-pointer">
                                 <input type="radio" name="payment_method" value="card" class="absolute top-2 right-2" checked>
-                                <img src="{{ asset('img/payment/card.png') }}" alt="Tarjeta de crédito" class="w-12 h-12 mb-2">
+                                <img src="{{ asset('img/payment/card.png') }}" class="w-12 h-12 mb-2">
                                 <span class="text-center">Tarjeta de crédito</span>
                             </label>
                             <label class="relative border rounded-lg p-4 flex flex-col items-center cursor-pointer">
                                 <input type="radio" name="payment_method" value="paypal" class="absolute top-2 right-2">
-                                <img src="{{ asset('img/payment/paypal.png') }}" alt="PayPal" class="w-12 h-12 mb-2">
+                                <img src="{{ asset('img/payment/paypal.png') }}" class="w-12 h-12 mb-2">
                                 <span class="text-center">PayPal</span>
                             </label>
                             <label class="relative border rounded-lg p-4 flex flex-col items-center cursor-pointer">
                                 <input type="radio" name="payment_method" value="transfer" class="absolute top-2 right-2">
-                                <img src="{{ asset('img/payment/transfer.png') }}" alt="Transferencia" class="w-12 h-12 mb-2">
+                                <img src="{{ asset('img/payment/transfer.png') }}" class="w-12 h-12 mb-2">
                                 <span class="text-center">Transferencia</span>
                             </label>
                         </div>
@@ -167,6 +167,7 @@
                 </div>
                 
                 <div class="mt-8">
+                    <input type="hidden" name="cart_items" id="cart-items-input" value="{{ session()->has('cart_items') ? json_encode(session('cart_items')) : '[]' }}">
                     <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition duration-200">
                         Finalizar Compra
                     </button>

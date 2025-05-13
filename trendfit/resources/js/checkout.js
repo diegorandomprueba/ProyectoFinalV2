@@ -45,6 +45,29 @@ function initPaymentMethodToggle() {
     const transferPaymentInfo = document.getElementById('transfer-payment-info');
     
     if (paymentMethods.length && cardPaymentInfo && paypalPaymentInfo && transferPaymentInfo) {
+        // Configuración inicial según el método seleccionado por defecto
+        const initialMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (initialMethod) {
+            // Ocultar todos los contenedores al inicio
+            cardPaymentInfo.classList.add('hidden');
+            paypalPaymentInfo.classList.add('hidden');
+            transferPaymentInfo.classList.add('hidden');
+            
+            // Mostrar el contenedor correspondiente al método seleccionado inicialmente
+            if (initialMethod.value === 'card') {
+                cardPaymentInfo.classList.remove('hidden');
+                // Activar los campos de tarjeta
+                cardPaymentInfo.querySelectorAll('input').forEach(input => {
+                    input.required = true;
+                });
+            } else if (initialMethod.value === 'paypal') {
+                paypalPaymentInfo.classList.remove('hidden');
+            } else if (initialMethod.value === 'transfer') {
+                transferPaymentInfo.classList.remove('hidden');
+            }
+        }
+        
+        // Añadir listeners para cambios
         paymentMethods.forEach(method => {
             method.addEventListener('change', function() {
                 // Ocultar todos los contenedores
@@ -60,7 +83,6 @@ function initPaymentMethodToggle() {
                 // Mostrar el contenedor correspondiente
                 if (this.value === 'card') {
                     cardPaymentInfo.classList.remove('hidden');
-                    
                     // Activar los campos de tarjeta
                     cardPaymentInfo.querySelectorAll('input').forEach(input => {
                         input.required = true;
@@ -142,6 +164,7 @@ function initFormValidation() {
         });
     }
 }
+
 
 /**
  * Inicializa la validación de teléfono
