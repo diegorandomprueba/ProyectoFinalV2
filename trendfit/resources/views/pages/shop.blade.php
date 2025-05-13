@@ -226,6 +226,7 @@
                                         data-id="{{ $producto->id }}"
                                         data-name="{{ $producto->name }}"
                                         data-price="{{ $producto->price }}"
+                                        data-size="{{ 'M' }}"
                                         data-image="{{ asset('img/product/' . $producto->image) }}"
                                     >
                                         <i class="fas fa-shopping-cart mr-2"></i> Añadir al Carrito

@@ -24,7 +24,8 @@
                         
                         <div>
                             <label for="shipping_phone" class="block text-gray-700 font-medium mb-2">Teléfono</label>
-                            <input type="tel" id="shipping_phone" name="shipping_phone" value="{{ auth()->user()->phone ?? '' }}" required class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <input type="tel" id="shipping_phone" name="shipping_phone" value="{{ auth()->user()->phone ?? '' }}" required pattern="[0-9]{9,10}" maxlength="10" title="Introduce un número de teléfono válido (solo números, máximo 10 dígitos)" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <p class="text-sm text-gray-500 mt-1">Solo números, máximo 10 dígitos</p>
                         </div>
                         
                         <div class="md:col-span-2">
@@ -39,7 +40,8 @@
                         
                         <div>
                             <label for="shipping_code" class="block text-gray-700 font-medium mb-2">Código Postal</label>
-                            <input type="text" id="shipping_code" name="shipping_code" value="{{ auth()->user()->postal_code ?? '' }}" required class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <input type="text" id="shipping_code" name="shipping_code" value="{{ auth()->user()->postal_code ?? '' }}" required pattern="[0-9]{5}" maxlength="5" title="El código postal debe tener 5 dígitos" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <p class="text-sm text-gray-500 mt-1">5 dígitos numéricos</p>
                         </div>
                         
                         <div class="md:col-span-2">
@@ -68,7 +70,8 @@
                         
                         <div>
                             <label for="billing_phone" class="block text-gray-700 font-medium mb-2">Teléfono</label>
-                            <input type="tel" id="billing_phone" name="billing_phone" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <input type="tel" id="billing_phone" name="billing_phone" pattern="[0-9]{9,10}" maxlength="10" title="Introduce un número de teléfono válido (solo números, máximo 10 dígitos)" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <p class="text-sm text-gray-500 mt-1">Solo números, máximo 10 dígitos</p>
                         </div>
                         
                         <div class="md:col-span-2">
@@ -83,7 +86,8 @@
                         
                         <div>
                             <label for="billing_code" class="block text-gray-700 font-medium mb-2">Código Postal</label>
-                            <input type="text" id="billing_code" name="billing_code" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <input type="text" id="billing_code" name="billing_code" pattern="[0-9]{5}" maxlength="5" title="El código postal debe tener 5 dígitos" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <p class="text-sm text-gray-500 mt-1">5 dígitos numéricos</p>
                         </div>
                         
                         <div class="md:col-span-2">
@@ -150,8 +154,8 @@
                         <p class="text-gray-700 mb-4">Serás redirigido a PayPal para completar el pago después de confirmar el pedido.</p>
                     </div>
                     
-<!-- Información de transferencia (oculto por defecto) -->
-<div id="transfer-payment-info" class="hidden">
+                    <!-- Información de transferencia (oculto por defecto) -->
+                    <div id="transfer-payment-info" class="hidden">
                         <div class="bg-gray-100 p-4 rounded-lg mb-4">
                             <p class="font-semibold mb-2">Datos para la transferencia:</p>
                             <p>Banco: Banco Trendfit</p>
@@ -227,107 +231,5 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle entre misma dirección de envío/facturación
-        const sameAsShippingCheckbox = document.getElementById('same_as_shipping');
-        const billingInfoContainer = document.getElementById('billing-info');
-        
-        sameAsShippingCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                billingInfoContainer.classList.add('hidden');
-                
-                // Desactivar los campos de facturación
-                billingInfoContainer.querySelectorAll('input').forEach(input => {
-                    input.required = false;
-                });
-            } else {
-                billingInfoContainer.classList.remove('hidden');
-                
-                // Activar los campos de facturación
-                billingInfoContainer.querySelectorAll('input').forEach(input => {
-                    input.required = true;
-                });
-            }
-        });
-        
-        // Toggle entre métodos de pago
-        const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
-        const cardPaymentInfo = document.getElementById('card-payment-info');
-        const paypalPaymentInfo = document.getElementById('paypal-payment-info');
-        const transferPaymentInfo = document.getElementById('transfer-payment-info');
-        
-        paymentMethods.forEach(method => {
-            method.addEventListener('change', function() {
-                // Ocultar todos los contenedores
-                cardPaymentInfo.classList.add('hidden');
-                paypalPaymentInfo.classList.add('hidden');
-                transferPaymentInfo.classList.add('hidden');
-                
-                // Desactivar todos los campos
-                cardPaymentInfo.querySelectorAll('input').forEach(input => {
-                    input.required = false;
-                });
-                
-                // Mostrar el contenedor correspondiente
-                if (this.value === 'card') {
-                    cardPaymentInfo.classList.remove('hidden');
-                    
-                    // Activar los campos de tarjeta
-                    cardPaymentInfo.querySelectorAll('input').forEach(input => {
-                        input.required = true;
-                    });
-                } else if (this.value === 'paypal') {
-                    paypalPaymentInfo.classList.remove('hidden');
-                } else if (this.value === 'transfer') {
-                    transferPaymentInfo.classList.remove('hidden');
-                }
-            });
-        });
-        
-        // Validación del formulario
-        const checkoutForm = document.getElementById('checkout-form');
-        
-        checkoutForm.addEventListener('submit', function(e) {
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-            
-            if (paymentMethod === 'card') {
-                const cardNumber = document.getElementById('card_number').value;
-                const cardName = document.getElementById('card_name').value;
-                const cardExpiry = document.getElementById('card_expiry').value;
-                const cardCvv = document.getElementById('card_cvv').value;
-                
-                const cardNumberRegex = /^\d{16}$/;
-                const cardExpiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
-                const cardCvvRegex = /^\d{3,4}$/;
-                
-                let valid = true;
-                
-                if (!cardNumberRegex.test(cardNumber.replace(/\s/g, ''))) {
-                    alert('Por favor, introduce un número de tarjeta válido (16 dígitos)');
-                    valid = false;
-                }
-                
-                if (cardName.trim() === '') {
-                    alert('Por favor, introduce el nombre que aparece en la tarjeta');
-                    valid = false;
-                }
-                
-                if (!cardExpiryRegex.test(cardExpiry)) {
-                    alert('Por favor, introduce una fecha de caducidad válida (MM/YY)');
-                    valid = false;
-                }
-                
-                if (!cardCvvRegex.test(cardCvv)) {
-                    alert('Por favor, introduce un CVV válido (3 o 4 dígitos)');
-                    valid = false;
-                }
-                
-                if (!valid) {
-                    e.preventDefault();
-                }
-            }
-        });
-    });
-</script>
+<script src="{{ asset('js/checkout.js') }}"></script>
 @endpush
