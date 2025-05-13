@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Comanda;
 use App\Models\User;
-use App\Models\Producte;
+use App\Models\Producto;
 use Illuminate\Http\Request;
 use PDF;
 use Illuminate\Support\Facades\Auth;
@@ -55,12 +55,23 @@ class AdminOrderController extends Controller
         if (!Auth::user()->isAdmin) {
             return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
         }
-
+    
         $order = Comanda::with(['user', 'productes'])->findOrFail($id);
         $users = User::all();
-        $products = Producte::where('stock', '>', 0)->get();
+        $products = Producto::where('stock', '>', 0)->get();
         
-        return view('admin.orders.edit', compact('order', 'users', 'products'));
+        // Calcular subtotal, impuestos y envío
+        $subtotal = 0;
+        foreach ($order->productes as $product) {
+            $subtotal += $product->price * $product->pivot->cant;
+        }
+        
+        $tax = $subtotal * 0.21;
+        $shipping = 4.99;
+        $discount = $order->discount ?? 0;
+        $total = $subtotal + $tax + $shipping - $discount;
+        
+        return view('admin.orders.edit', compact('order', 'users', 'products', 'subtotal', 'tax', 'shipping', 'discount', 'total'));
     }
     
     public function update(Request $request, $id)

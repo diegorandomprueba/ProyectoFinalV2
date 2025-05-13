@@ -168,10 +168,16 @@ function deleteProduct(productId) {
         fetch(`/admin/products/${productId}`, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 document.getElementById(`product-row-${productId}`).remove();
@@ -182,7 +188,7 @@ function deleteProduct(productId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            showNotification('Error al eliminar el producto', 'error');
+            showNotification('Error al eliminar el producto. Por favor, revisa la consola para más detalles.', 'error');
         });
     }
 }

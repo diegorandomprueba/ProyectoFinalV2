@@ -34,7 +34,7 @@
                 </div>
             </div>
             
-            <div class="mb-6">
+            <!--<div class="mb-6">
                 <h3 class="text-lg font-semibold mb-4">Estado del Pedido</h3>
                 <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="flex items-center">
                     @csrf
@@ -51,7 +51,7 @@
                         Actualizar Estado
                     </button>
                 </form>
-            </div>
+            </div>-->
         </div>
     </div>
     

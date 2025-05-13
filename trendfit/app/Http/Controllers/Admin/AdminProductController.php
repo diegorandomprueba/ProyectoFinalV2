@@ -165,27 +165,40 @@ class AdminProductController extends Controller
             return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
         }
 
-        $product = Producto::findOrFail($id);
-        
-        // Comprobar si el producto está en algún pedido
-        $inOrders = $product->comandas()->exists();
-        
-        if ($inOrders) {
+        try {
+            $product = Producto::findOrFail($id);
+            
+            // Comprobar si el producto está en algún pedido
+            $inOrders = DB::table('comanda_prod')
+                          ->where('idProducte', $id)
+                          ->exists();
+            
+            if ($inOrders) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar el producto porque está asociado a pedidos existentes'
+                ]);
+            }
+            
+            // Eliminar la imagen si existe
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            
+            // Eliminar el producto
+            $product->delete();
+            
+            return response()->json(['success' => true]);
+            
+        } catch (\Exception $e) {
+            // Log del error para diagnóstico
+            \Log::error('Error al eliminar producto: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
-                'message' => 'No se puede eliminar el producto porque está asociado a pedidos existentes'
-            ]);
+                'message' => 'Error al eliminar el producto: ' . $e->getMessage()
+            ], 500);
         }
-        
-        // Eliminar la imagen
-        if ($product->image && Storage::disk('public')->exists($product->image)) {
-            Storage::disk('public')->delete($product->image);
-        }
-        
-        // Eliminar el producto
-        $product->delete();
-        
-        return response()->json(['success' => true]);
     }
     
     public function updatePrice(Request $request, $id)
