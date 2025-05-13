@@ -83,13 +83,13 @@
     <!-- Ventas mensuales -->
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h3 class="text-lg font-semibold mb-4">Ventas Mensuales</h3>
-        <canvas id="salesChart" height="300"></canvas>
+        <canvas id="salesChart" width="400" height="300"></canvas>
     </div>
     
     <!-- Top Productos -->
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h3 class="text-lg font-semibold mb-4">Top Productos Vendidos</h3>
-        <canvas id="productsChart" height="300"></canvas>
+        <canvas id="productsChart" width="400" height="300"></canvas>
     </div>
 </div>
 
@@ -112,9 +112,6 @@
                         Fecha
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Total
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Estado
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -123,26 +120,23 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach($latestOrders as $order)
+                @forelse($latestOrders as $order)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             #{{ $order->id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $order->user->name }}
+                            {{ $order->user->name ?? 'Usuario desconocido' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $order->created_at->format('d/m/Y H:i') }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ number_format($order->total, 2) }}€
+                            {{ $order->created_at ? $order->created_at->format('d/m/Y H:i') : 'Fecha no disponible' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {{ $order->status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                {{ isset($order->status) ? ($order->status === 'completed' ? 'bg-green-100 text-green-800' : 
                                    ($order->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                                   'bg-red-100 text-red-800') }}">
-                                {{ ucfirst($order->status) }}
+                                   'bg-red-100 text-red-800')) : 'bg-gray-100 text-gray-800' }}">
+                                {{ ucfirst($order->status ?? 'Pendiente') }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -151,7 +145,13 @@
                             </a>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                            No hay pedidos recientes
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -164,83 +164,14 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Datos para el gráfico de ventas mensuales
-        const salesCtx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(salesCtx, {
-            type: 'line',
-            data: {
-                labels: {!! json_encode($monthlySalesLabels) !!},
-                datasets: [{
-                    label: 'Ventas (€)',
-                    data: {!! json_encode($monthlySalesData) !!},
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        
-        // Datos para el gráfico de productos más vendidos
-        const productsCtx = document.getElementById('productsChart').getContext('2d');
-        const productsChart = new Chart(productsCtx, {
-            type: 'bar',
-            data: {
-                labels: {!! json_encode($topProductsLabels) !!},
-                datasets: [{
-                    label: 'Unidades vendidas',
-                    data: {!! json_encode($topProductsData) !!},
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(153, 102, 255, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                }
-            }
-        });
-    });
+    // Pasar los datos desde PHP a JavaScript
+    window.dashboardData = {
+        monthlySalesLabels: {!! json_encode($monthlySalesLabels) !!},
+        monthlySalesData: {!! json_encode($monthlySalesData) !!},
+        topProductsLabels: {!! json_encode($topProductsLabels) !!},
+        topProductsData: {!! json_encode($topProductsData) !!}
+    };
 </script>
+@vite(['resources/js/admin/dashboard-charts.js'])
 @endpush

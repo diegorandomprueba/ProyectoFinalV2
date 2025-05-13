@@ -1,31 +1,46 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
+
 
 class AdminUserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'admin']);
-    }
     
     public function index()
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $users = User::paginate(20);
         return view('admin.users.index', compact('users'));
     }
     
     public function create()
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         return view('admin.users.create');
     }
     
     public function store(Request $request)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -45,18 +60,33 @@ class AdminUserController extends Controller
     
     public function show($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $user = User::with('comandes')->findOrFail($id);
         return view('admin.users.show', compact('user'));
     }
     
     public function edit($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $user = User::findOrFail($id);
         return view('admin.users.edit', compact('user'));
     }
     
     public function update(Request $request, $id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $user = User::findOrFail($id);
         
         $validated = $request->validate([
@@ -84,6 +114,11 @@ class AdminUserController extends Controller
     
     public function destroy($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $user = User::findOrFail($id);
         
         // Verificar si el usuario tiene pedidos asociados

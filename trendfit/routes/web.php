@@ -7,12 +7,18 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OpinionController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminCategoryController;
-use App\Http\Controllers\AdminSubcategoryController;
-use App\Http\Controllers\AdminProductController;
+
+// Controladores de administración
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminSubcategoryController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminUserController;
+
+use App\Http\Middleware\IsAdminUser;
 
 // Rutas públicas
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -21,8 +27,11 @@ Route::get('/where', [HomeController::class, 'where'])->name('where');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
 // Rutas de autenticación (acceso público)
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Tienda
 Route::get('/shop', [ProductController::class, 'index'])->name('shop');
@@ -43,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     
-    // Perfil de usuario - Usar una sola versión del controlador de perfil
+    // Perfil de usuario
     Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
     Route::get('/profile/edit', [HomeController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile/update', [HomeController::class, 'updateProfile'])->name('profile.update');
@@ -52,6 +61,8 @@ Route::middleware(['auth'])->group(function () {
     // Pedidos
     Route::get('/orders', [HomeController::class, 'orders'])->name('orders');
     Route::get('/orders/{id}', [HomeController::class, 'showOrder'])->name('orders.show');
+    Route::get('/orders/{id}/invoice', [HomeController::class, 'generateInvoice'])->name('orders.invoice');
+    Route::post('/orders/{id}/remind', [HomeController::class, 'remindReview'])->name('orders.remind');
     
     // Opiniones (para usuarios autenticados)
     Route::post('/api/opinions', [OpinionController::class, 'storeOpinion']);
@@ -62,38 +73,67 @@ Route::get('/api/opinions/{productId}', [OpinionController::class, 'getOpinions'
 Route::get('/api/ratings/{limit?}', [OpinionController::class, 'getRating']);
 
 // Panel de administración
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     
     // Productos
-    Route::resource('products', AdminProductController::class);
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', [AdminProductController::class, 'index'])->name('index');
+        Route::get('/create', [AdminProductController::class, 'create'])->name('create');
+        Route::post('/', [AdminProductController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AdminProductController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminProductController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminProductController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/update-price', [AdminProductController::class, 'updatePrice'])->name('updatePrice');
+        Route::post('/{id}/update-stock', [AdminProductController::class, 'updateStock'])->name('updateStock');
+    });
     
     // Categorías
-    Route::resource('categories', AdminCategoryController::class);
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', [AdminCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [AdminCategoryController::class, 'create'])->name('create');
+        Route::post('/', [AdminCategoryController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AdminCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminCategoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminCategoryController::class, 'destroy'])->name('destroy');
+    });
     
     // Subcategorías
-    Route::resource('subcategories', AdminSubcategoryController::class);
+    Route::prefix('subcategories')->name('subcategories.')->group(function () {
+        Route::get('/', [AdminSubcategoryController::class, 'index'])->name('index');
+        Route::get('/create', [AdminSubcategoryController::class, 'create'])->name('create');
+        Route::post('/', [AdminSubcategoryController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AdminSubcategoryController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminSubcategoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminSubcategoryController::class, 'destroy'])->name('destroy');
+        Route::get('/by-category/{categoryId}', [AdminSubcategoryController::class, 'getSubcategoriesByCategory'])->name('byCategory');
+    });
     
     // Pedidos
-    Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
-    Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('admin.orders.show');
-    Route::put('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [AdminOrderController::class, 'index'])->name('index');
+        Route::get('/{id}', [AdminOrderController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [AdminOrderController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminOrderController::class, 'update'])->name('update');
+        Route::put('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
+        Route::delete('/{id}', [AdminOrderController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/invoice', [AdminOrderController::class, 'generateInvoice'])->name('generateInvoice');
+    });
     
     // Usuarios
-    Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
-    Route::get('/users/{id}', [AdminController::class, 'showUser'])->name('admin.users.show');
-    Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [AdminUserController::class, 'index'])->name('index');
+        Route::get('/create', [AdminUserController::class, 'create'])->name('create');
+        Route::post('/', [AdminUserController::class, 'store'])->name('store');
+        Route::get('/{id}', [AdminUserController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [AdminUserController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminUserController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminUserController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Rutas legales
 Route::get('/legal/terms', [HomeController::class, 'terms'])->name('legal.terms');
 Route::get('/legal/cookies', [HomeController::class, 'cookies'])->name('legal.cookies');
 Route::get('/legal/privacy', [HomeController::class, 'privacy'])->name('legal.privacy');
-
-// Dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// Incluir las rutas de autenticación de Breeze
-require __DIR__.'/auth.php';

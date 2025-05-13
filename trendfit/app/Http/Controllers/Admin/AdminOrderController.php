@@ -1,28 +1,38 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Comanda;
 use App\Models\User;
 use App\Models\Producte;
 use Illuminate\Http\Request;
 use PDF;
+use Illuminate\Support\Facades\Auth;
+
+use App\Http\Controllers\Controller;
+
 
 class AdminOrderController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'admin']);
-    }
     
     public function index()
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $orders = Comanda::with('user')->orderBy('created_at', 'desc')->paginate(20);
         return view('admin.orders.index', compact('orders'));
     }
     
     public function show($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $order = Comanda::with(['user', 'productes'])->findOrFail($id);
         
         // Calcular subtotal, impuestos y envío
@@ -41,6 +51,11 @@ class AdminOrderController extends Controller
     
     public function edit($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $order = Comanda::with(['user', 'productes'])->findOrFail($id);
         $users = User::all();
         $products = Producte::where('stock', '>', 0)->get();
@@ -50,6 +65,11 @@ class AdminOrderController extends Controller
     
     public function update(Request $request, $id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $order = Comanda::findOrFail($id);
         
         $validated = $request->validate([
@@ -69,6 +89,11 @@ class AdminOrderController extends Controller
     
     public function updateStatus(Request $request, $id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $request->validate([
             'status' => 'required|in:pending,processing,completed,cancelled'
         ]);
@@ -82,6 +107,11 @@ class AdminOrderController extends Controller
     
     public function destroy($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $order = Comanda::findOrFail($id);
         
         // Primero eliminar las relaciones en la tabla pivote
@@ -95,6 +125,11 @@ class AdminOrderController extends Controller
     
     public function generateInvoice($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $order = Comanda::with(['user', 'productes'])->findOrFail($id);
         
         // Calcular subtotal, impuestos y envío

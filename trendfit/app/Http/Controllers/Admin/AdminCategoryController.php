@@ -1,30 +1,44 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Categoria;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminCategoryController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'admin']);
-    }
     
     public function index()
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $categories = Categoria::paginate(20);
         return view('admin.categories.index', compact('categories'));
     }
     
     public function create()
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         return view('admin.categories.create');
     }
     
     public function store(Request $request)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255|unique:categorias',
             'descr' => 'nullable|string',
@@ -47,12 +61,22 @@ class AdminCategoryController extends Controller
     
     public function edit($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $category = Categoria::findOrFail($id);
         return view('admin.categories.edit', compact('category'));
     }
     
     public function update(Request $request, $id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255|unique:categorias,name,' . $id,
             'descr' => 'nullable|string',
@@ -80,6 +104,11 @@ class AdminCategoryController extends Controller
     
     public function destroy($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $category = Categoria::findOrFail($id);
         
         // Comprobar si la categoría tiene subcategorías

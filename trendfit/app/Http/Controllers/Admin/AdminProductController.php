@@ -1,22 +1,30 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Models\Producto;
+use App\Models\Producto; 
 use App\Models\Categoria;
 use App\Models\Subcategoria;
+use App\Models\Comanda;
+use App\Models\User;
+use App\Models\ComandaProd;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class AdminProductController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'admin']);
-    }
     
     public function index(Request $request)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $query = Producto::query();
         
         // Aplicar filtros
@@ -53,6 +61,11 @@ class AdminProductController extends Controller
     
     public function create()
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $categories = Categoria::all();
         $subcategories = Subcategoria::all();
         return view('admin.products.create', compact('categories', 'subcategories'));
@@ -60,6 +73,11 @@ class AdminProductController extends Controller
     
     public function store(Request $request)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'descr' => 'required|string',
@@ -87,6 +105,11 @@ class AdminProductController extends Controller
     
     public function edit($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $product = Producto::findOrFail($id);
         $categories = Categoria::all();
         $subcategories = Subcategoria::all();
@@ -96,6 +119,11 @@ class AdminProductController extends Controller
     
     public function update(Request $request, $id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'descr' => 'required|string',
@@ -132,6 +160,11 @@ class AdminProductController extends Controller
     
     public function destroy($id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $product = Producto::findOrFail($id);
         
         // Comprobar si el producto está en algún pedido
@@ -157,6 +190,11 @@ class AdminProductController extends Controller
     
     public function updatePrice(Request $request, $id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $request->validate([
             'price' => 'required|numeric|min:0'
         ]);
@@ -170,6 +208,11 @@ class AdminProductController extends Controller
     
     public function updateStock(Request $request, $id)
     {
+        // Verificar si el usuario es administrador
+        if (!Auth::user()->isAdmin) {
+            return redirect()->route('home')->with('error', 'No tienes permisos para acceder a esta sección');
+        }
+
         $request->validate([
             'stock' => 'required|integer|min:0'
         ]);

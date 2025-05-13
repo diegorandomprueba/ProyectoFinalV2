@@ -27,10 +27,12 @@ class AuthController extends Controller
             
             // Verificar si hay productos pendientes de valoración
             $user = Auth::user();
-            $pendingReviews = \DB::table('comanda_prods')
-                                ->join('comandas', 'comanda_prods.idComanda', '=', 'comandas.id')
-                                ->where('comandas.idUsuari', $user->id)
-                                ->where('comanda_prods.has_to_comment', true)
+            
+            // Consulta corregida: comandas → comanda
+            $pendingReviews = \DB::table('comanda_prod')
+                                ->join('comanda', 'comanda_prod.idComanda', '=', 'comanda.id')
+                                ->where('comanda.idUsuari', $user->id)
+                                ->where('comanda_prod.has_to_comment', true)
                                 ->exists();
             
             if ($pendingReviews) {
@@ -38,7 +40,7 @@ class AuthController extends Controller
             }
             
             // Redirigir según el tipo de usuario
-            if ($user->isAdmin()) {
+            if ($user->isAdmin) {
                 return redirect()->intended(route('admin.dashboard'));
             } else {
                 return redirect()->intended(route('home'));
@@ -71,7 +73,7 @@ class AuthController extends Controller
         $user->password = Hash::make($validated['password']);
         $user->phone = $validated['phone'] ?? null;
         $user->birth_date = $validated['birth_date'] ?? null;
-        $user->isAdmin = true; 
+        $user->isAdmin = false; // Cambiado a false para que los nuevos usuarios no sean administradores por defecto
         $user->save();
         
         Auth::login($user);

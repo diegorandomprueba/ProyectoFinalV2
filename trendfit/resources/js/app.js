@@ -12,6 +12,7 @@ import './profile.js';
 import './register.js';
 import './shop.js';
 import './video.js';
+import './admin/dashboard-charts.js';
 
 // Global utility functions
 window.showNotification = function(message, type = 'success') {
