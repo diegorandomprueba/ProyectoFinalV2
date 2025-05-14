@@ -75,7 +75,11 @@ class CheckoutController extends Controller
             $request->validate([
                 'card_number' => 'required|string|regex:/^[0-9]{16}$/',
                 'card_name' => 'required|string|max:255',
-                'card_expiry' => 'required|string|regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/',
+                'card_expiry' => [
+                    'required',
+                    'string',
+                    'regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/'
+                ],                
                 'card_cvv' => 'required|string|regex:/^[0-9]{3,4}$/',
             ]);
         }

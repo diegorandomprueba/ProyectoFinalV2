@@ -13,7 +13,7 @@ class ComandaProd extends Model
     use HasFactory;
 
     protected $table = 'comanda_prod';
-    protected $fillable = ['idComanda', 'idProducte', 'cant', 'has_to_comment'];
+    protected $fillable = ['idComanda', 'idProducte', 'cant', 'has_to_comment', 'size'];
 
     public function comanda()
     {

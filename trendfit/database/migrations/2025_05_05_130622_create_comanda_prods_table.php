@@ -14,6 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('idProducte');
             $table->integer('cant');
             $table->boolean('has_to_comment');
+            $table->string('size');
             $table->foreign('idComanda')->references('id')->on('comanda');
             $table->foreign('idProducte')->references('id')->on('producte');
             $table->timestamps();
