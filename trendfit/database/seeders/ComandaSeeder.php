@@ -21,7 +21,7 @@ class ComandaSeeder extends Seeder
                 'phone' => '697959967',
                 'status' => 'Completado',
                 'payment_method' => 'paypal',
-                'total' => 100
+                'total' => 100.00
             ],
             [
                 'idUsuari' => 3,
@@ -34,7 +34,7 @@ class ComandaSeeder extends Seeder
                 'phone' => '697959945',
                 'status' => 'Completado',
                 'payment_method' => 'paypal',
-                'total' => 100
+                'total' => 100.50
             ]
         ]);
     }

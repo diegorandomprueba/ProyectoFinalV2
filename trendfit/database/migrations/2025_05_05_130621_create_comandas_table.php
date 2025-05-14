@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('status');
             $table->string('payment_method');
-            $table->integer('total');
+            $table->decimal('total', 9, 2);
             $table->foreign('idUsuari')->references('id')->on('users');
             $table->timestamps();
         });
