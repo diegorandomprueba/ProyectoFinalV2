@@ -3,8 +3,6 @@ import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 Alpine.start();
 
-// Import our custom scripts
-
 import './cart.js';
 import './validation.js';
 import './product.js';
@@ -16,7 +14,6 @@ import './admin/dashboard-charts.js';
 import './checkout.js';
 import './order-succes.js';
 
-// Global utility functions
 window.showNotification = function(message, type = 'success') {
     const notification = document.createElement('div');
     notification.classList.add('notification', `notification-${type}`);
@@ -36,9 +33,7 @@ window.showNotification = function(message, type = 'success') {
     }, 3000);
 };
 
-// Check if any elements need to be updated when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Add floating cart if in mobile view and not on cart or checkout pages
     if (window.innerWidth < 768 && 
         !window.location.pathname.includes('/cart') && 
         !window.location.pathname.includes('/checkout')) {
@@ -56,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.appendChild(floatingCart);
         
-        // Update cart counter if necessary
         fetch('/cart/count')
             .then(response => response.json())
             .then(data => {
@@ -68,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Show a reminder to review products if applicable
     const reviewReminder = document.getElementById('review-reminder');
     if (reviewReminder) {
         setTimeout(() => {
@@ -76,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // Initialize sliders and carousels using Swiper if present
     if (typeof Swiper !== 'undefined' && document.querySelector('.swiper')) {
         new Swiper('.swiper', {
             slidesPerView: 'auto',

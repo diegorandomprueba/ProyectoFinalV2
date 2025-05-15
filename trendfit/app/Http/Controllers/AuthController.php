@@ -63,16 +63,12 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'nullable|string|max:20',
-            'birth_date' => 'nullable|date|before:today|after:1920-01-01',
         ]);
         
         $user = new User();
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->password = Hash::make($validated['password']);
-        $user->phone = $validated['phone'] ?? null;
-        $user->birth_date = $validated['birth_date'] ?? null;
         $user->isAdmin = false; // Cambiado a false para que los nuevos usuarios no sean administradores por defecto
         $user->save();
         

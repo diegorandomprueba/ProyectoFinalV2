@@ -99,8 +99,11 @@
                                     </a>
                                     <div class="mt-4">
                                         <button 
-                                            onclick="addToCart({{ $product->id }})" 
-                                            class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-200"
+                                            class="shop-add-to-cart bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-200"
+                                            data-id="{{ $product->id }}"
+                                            data-name="{{ $product->name }}"
+                                            data-price="{{ $product->price }}"
+                                            data-image="{{ $product->image }}"
                                         >
                                             Añadir al Carrito
                                         </button>
