@@ -63,11 +63,14 @@ Route::middleware(['auth'])->group(function () {
     // Pedidos
     Route::get('/orders', [HomeController::class, 'orders'])->name('orders');
     Route::get('/orders/{id}', [HomeController::class, 'showOrder'])->name('orders.show');
-    Route::get('/orders/{id}/invoice', [HomeController::class, 'generateInvoice'])->name('orders.invoice');
+    Route::get('/orders/{id}/invoice', [AdminOrderController::class, 'generateInvoice'])->name('orders.invoice');
     Route::post('/orders/{id}/remind', [HomeController::class, 'remindReview'])->name('orders.remind');
     
     // Opiniones (para usuarios autenticados)
     Route::post('/api/opinions', [OpinionController::class, 'storeOpinion']);
+
+    // Añade esta ruta en el grupo de rutas autenticadas
+    Route::post('/products/{id}/rate', [OpinionController::class, 'rate'])->name('products.rate');
 });
 
 // API Opiniones (acceso público)

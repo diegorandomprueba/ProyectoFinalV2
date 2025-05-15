@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Services\OpinionService;
 use App\Models\ComandaProd;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Producto;
+use App\Models\Categoria;
+use App\Models\Opinion;
 
 class OpinionController extends Controller
 {
@@ -26,6 +29,49 @@ class OpinionController extends Controller
         }
     }
     
+    public function rate(Request $request, $id)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        try {
+            $product = Producto::findOrFail($id);
+            $userId = Auth::id();
+            
+            // Verificar si el usuario ya ha valorado este producto
+            $existingOpinion = Opinion::where('user_id', $userId)
+                ->where('product_id', $id)
+                ->first();
+                
+            if ($existingOpinion) {
+                // Actualizar la valoración existente
+                $existingOpinion->rating = $request->rating;
+                $existingOpinion->save();
+            } else {
+                // Crear una nueva valoración
+                $opinion = new Opinion([
+                    'product_id' => $id,
+                    'user_id' => $userId,
+                    'user_name' => Auth::user()->name,
+                    'rating' => $request->rating,
+                    'date' => now(),
+                ]);
+                $opinion->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Valoración guardada correctamente',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar la valoración: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function storeOpinion(Request $request)
     {
         $request->validate([

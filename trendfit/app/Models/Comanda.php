@@ -34,6 +34,6 @@ class Comanda extends Model
     public function productes()
     {
         return $this->belongsToMany(Producto::class, 'comanda_prod', 'idComanda', 'idProducte')
-            ->withPivot('cant', 'has_to_comment');
+            ->withPivot('cant', 'has_to_comment', 'size');
     }
 }

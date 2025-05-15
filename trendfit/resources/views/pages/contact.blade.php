@@ -64,34 +64,35 @@
             <div class="p-8">
                 <h2 class="text-2xl font-semibold mb-6">Envíanos un Mensaje</h2>
                 
-                <form action="{{ route('contact.send') }}" method="POST" class="space-y-6">
+                <form id="contact-form" class="space-y-6">
                     @csrf
                     <div>
                         <label for="name" class="block text-gray-700 font-medium mb-2">Nombre Completo</label>
                         <input type="text" id="name" name="name" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
                     </div>
-                    
                     <div>
                         <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
                         <input type="email" id="email" name="email" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
                     </div>
-                    
                     <div>
                         <label for="subject" class="block text-gray-700 font-medium mb-2">Asunto</label>
                         <input type="text" id="subject" name="subject" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
                     </div>
-                    
                     <div>
                         <label for="message" class="block text-gray-700 font-medium mb-2">Mensaje</label>
                         <textarea id="message" name="message" rows="5" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required></textarea>
                     </div>
-                    
                     <div>
-                        <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition duration-200">
+                        <button type="button" onclick="showThankYouMessage()" class="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition duration-200">
                             Enviar Mensaje
                         </button>
                     </div>
                 </form>
+
+                <div id="thank-you-message" class="hidden mt-6 p-4 bg-green-100 text-green-700 rounded-lg">
+                    <p class="font-medium">¡Gracias por tu mensaje!</p>
+                    <p>Nos pondremos en contacto contigo a la brevedad posible.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -148,3 +149,23 @@
     </div>
 </div>
 @endsection
+
+<script>
+function showThankYouMessage() {
+    // Validar el formulario manualmente
+    const form = document.getElementById('contact-form');
+    if (form.checkValidity()) {
+        // Ocultar formulario
+        form.classList.add('hidden');
+        
+        // Mostrar mensaje de agradecimiento
+        document.getElementById('thank-you-message').classList.remove('hidden');
+        
+        // Opcional: Resetear el formulario
+        form.reset();
+    } else {
+        // Activar la validación visual del navegador
+        form.reportValidity();
+    }
+}
+</script>

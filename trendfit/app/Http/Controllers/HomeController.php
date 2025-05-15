@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
+use App\Models\Comanda;
 use App\Models\Categoria;
 use App\Services\OpinionService;
 use Illuminate\Http\Request;
@@ -125,12 +126,15 @@ class HomeController extends Controller
     
     public function showOrder($id)
     {
-        $order = auth()->user()->comandes()->findOrFail($id);
-        
+        //$order = auth()->user()->comandes()->findOrFail($id);
+        $order = Comanda::with(['user', 'productes'])->findOrFail($id);
+
         // Calcular subtotal, impuestos y envío
         $subtotal = 0;
-        foreach ($order->products as $product) {
-            $subtotal += $product->price * $product->pivot->cant;
+        if ($order->productes) {
+            foreach ($order->productes as $product) {
+                $subtotal += $product->price * $product->pivot->cant;
+            }
         }
         
         $tax = $subtotal * 0.21;
@@ -139,13 +143,15 @@ class HomeController extends Controller
         
         // Verificar si todos los productos han sido revisados
         $allProductsReviewed = true;
-        foreach ($order->products as $product) {
-            if (!$product->pivot->has_comment) {
-                $allProductsReviewed = false;
-                break;
-            }
-        }
-        
+                if ($order->productes) {
+                    foreach ($order->productes as $product) {
+                        if (!$product->pivot->has_comment) {
+                            $allProductsReviewed = false;
+                            break;
+                        }
+                    }
+                }
+
         return view('pages.orders.show', compact('order', 'subtotal', 'tax', 'shipping', 'discount', 'allProductsReviewed'));
     }
     

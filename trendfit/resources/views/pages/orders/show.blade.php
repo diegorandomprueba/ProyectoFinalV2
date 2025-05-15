@@ -6,7 +6,7 @@
 <div class="container mx-auto py-10">
     <div class="max-w-4xl mx-auto">
         <div class="mb-6 flex items-center">
-            <a href="{{ route('orders.index') }}" class="text-gray-600 hover:text-gray-900">
+            <a href="{{ route('orders') }}" class="text-gray-600 hover:text-gray-900">
                 <i class="fas fa-arrow-left mr-2"></i> Volver a mis pedidos
             </a>
         </div>
@@ -33,7 +33,7 @@
                 <h3 class="text-lg font-semibold mb-4">Productos</h3>
                 
                 <div class="space-y-4">
-                    @foreach($order->products as $product)
+                    @foreach($order->productes as $product)
                         <div class="flex items-center">
                             <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-16 h-16 object-cover rounded mr-4">
                             <div class="flex-1">
